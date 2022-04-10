@@ -1,0 +1,22 @@
+<policies>
+    <inbound>
+        <set-variable name="returnXml" value="@(context.Request.Headers.GetValueOrDefault("Content-Type","").Contains("application/xml"))" />
+        <base />
+        <set-backend-service id="apim-generated-policy" backend-id="WebApp_greeting-app" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <choose>
+            <when condition="@(context.Variables.GetValueOrDefault<bool>("returnXml"))">
+                <json-to-xml apply="always" consider-accept-header="false" parse-date="false" />
+            </when>
+            <otherwise />
+        </choose>
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

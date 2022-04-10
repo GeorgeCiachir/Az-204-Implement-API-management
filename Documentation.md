@@ -80,7 +80,11 @@ Here are some examples of functionality that could be offloaded to a gateway:
 - Policies are applied inside the gateway which sits between the API consumer and the managed API
 - A policy can apply changes to both the inbound request and outbound response
 - The policy definition is a simple XML document that describes a sequence of inbound and outbound statements
-- The configuration is divided into **inbound**, **backend**, **outbound**, **and on-error**
+- The configuration is divided into: 
+  - **inbound** - when a request is received from a client
+  - **backend** - executes before a request is forwarded to a client
+  - **outbound** - before the response is sent to the client
+  - **on-error** - when an exception is raised
 ```
 <policies>
   <inbound>
@@ -102,6 +106,27 @@ Here are some examples of functionality that could be offloaded to a gateway:
   sections are skipped and execution jumps to the statements in the on-error section
 
 ![img_1.png](img_1.png)
+
+- In this application, [this combination of policies](azure_implemented_policy.txt) has been applied 
+
+## Policy scopes
+- **Global scope** - affects all APIs within the instance of an API management
+- **Product scope** - manages access to the product as a single entity. Affects all APIs under this product
+- **API scope** - affects a single API
+- **Operation scope** - affects only one operation within the API
+Policies support inheritance, so we can override policies set at a higher scope
+
+## Access restriction policies
+- Limit call rate by key - prevents API usage by limiting call rate, on a per key basis
+- Validate JWT tokens
+- Set usage quota by key - enforces renewable or lifetime call volume and/or bandwidth quota
+- CheckHTTP header presence
+- Limit call rate by subscription - prevents API usage by limiting call rate, on a per subscription basis 
+
+## Caching policies
+- Store to cache
+- Get from cache
+- Remove from cache
 
 ## Create advanced policies
 
@@ -226,4 +251,19 @@ curl https://<apim gateway>.azure-api.net/api/path?subscription-key=<key string>
 | Thumbprint                   | 	Allow certificates containing a specified thumbprint |
 | Subject                      | 	Only allow certificates with a specified subject     |
 | Expiration Date              | Only allow certificates that have not expired         |
+
+## Create and use the API management
+1. create an application (I have created mine in the App Services)
+2. create an API management gateway (it takes forever)
+3. in the API management, go to the `APIs` blade and define a new API. There are several options
+4. this new created API will essentially forward the requests to your actual application
+5. if you now go to the developer portal, as an admin, you also have the option to edit the portal appearance and create a new revision and then publish it
+6. go to the `Portal overview` blade and  publish the portal (you can switch between revisions). Also, **Enable CORS**
+7. in the `Products` blade add a new product (you have 2 options: **Starter** and **Unlimited**):
+   - **Starter** - Subscribers will be able to run 5 calls/minute up to a maximum of 100 calls/week
+   - **Unlimited** - Subscribers have completely unlimited access to the API. Administrator approval is required
+8. open the developer portal in incognito window (because you are an admin, and you want to test as a developer) so that you can test the API
+9. as a developer, use the sig-up functionality and create a new account
+10. after the account is created, go to the products section and select the product to subscribe to the product using the subscription you want
+11. at this point you will be granted a `subscriptionKey` that can be used to make the requests in the API
 
