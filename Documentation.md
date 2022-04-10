@@ -192,18 +192,38 @@ Here are some examples of functionality that could be offloaded to a gateway:
 - A subscription is essentially a named container for a pair of subscription keys
   ![img_2.png](img_2.png)
 
-## Subscriptions and Keys
+### Subscriptions and Keys
 - A subscription key is a unique auto-generated key that can be passed through in the headers of the client request or
   as a query string parameter
 - The key is directly related to a subscription, which can be scoped to different areas
+- Clients of the API must include a valid key in all HTTP requests
+- Keys can be passed in the request header, or as a query string in the URL
+- the default header name is **Ocp-Apim-Subscription-Key**, and the default query string is **subscription-key**
+```
+curl --header "Ocp-Apim-Subscription-Key: <key string>" https://<apim gateway>.azure-api.net/api/path
+```
+```
+curl https://<apim gateway>.azure-api.net/api/path?subscription-key=<key string>
+```
 
 | Scope       | Details                                                                                                                                                                                                    |
-|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|:------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | All APIs    | Applies to every API accessible from the gateway                                                                                                                                                           |
 | Single API  | This scope applies to a single imported API and all of its endpoints                                                                                                                                       |
 | Product     | A product is a collection of one or more APIs that you configure in API Management. You can assign APIs to more than one product. Products can have different access rules, usage quotas, and terms of use |
+
 
 ## Secure APIs by using certificates
 - Certificates can be used to provide Transport Layer Security (TLS) mutual authentication between the client and the API gateway
 - You can configure the API Management gateway to allow only requests with certificates containing a specific thumbprint
 - The authorization at the gateway level is handled through inbound policies
+- With TLS client authentication, the API Management gateway can inspect the certificate contained within the client 
+  request and check for properties like:
+
+| Property                     | Description                                           |
+|:-----------------------------|:------------------------------------------------------|
+| Certificate Authority (CA)   | 	 Only allow certificates signed by a particular CA   |
+| Thumbprint                   | 	Allow certificates containing a specified thumbprint |
+| Subject                      | 	Only allow certificates with a specified subject     |
+| Expiration Date              | Only allow certificates that have not expired         |
+
