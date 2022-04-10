@@ -1,4 +1,4 @@
-package com.example.az204implementapimanagement;
+package com.georgeciachir.az204implementapimanagement;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
